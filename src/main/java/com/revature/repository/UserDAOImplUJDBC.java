@@ -161,7 +161,24 @@ public class UserDAOImplUJDBC implements UserDAO {
 	@Override
 	public boolean deleteUser(User user) {
 		// TODO Auto-generated method stub
-		return false;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		final String query = "DELETE FROM users WHERE id = ?";
+		try {
+			conn = ConnectionUtil.getConnection();
+			stmt = conn.prepareStatement(query);
+			stmt.setLong(1, user.getId());
+			stmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			StreamCloser.close(stmt);
+			StreamCloser.close(conn);
+		}
+		
+		return true;
+		
 	}
 
 }

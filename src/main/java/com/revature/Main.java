@@ -13,14 +13,18 @@ import com.revature.repository.UserDAOImplUJDBC;
 public class Main {
 
 	public static void main(String[] args) {
-		//BankCLI.menu();
-		UserDAO userDAO = new UserDAOImplUJDBC();
+		BankCLI.menu();
+		//UserDAO userDAO = new UserDAOImplUJDBC();
 		//userDAO.createUser(new User(0L, "AJack7", "1234", "Andrew Jackson", 20));
-		userDAO.getUsers().forEach((User u)->{System.out.println(u);});
+		//userDAO.getUsers().forEach((User u)->{System.out.println(u);});
 		
-		User al = userDAO.getUser("Hamilton1");
-		al.setBalance(10);
-		userDAO.updateUser(al);
+		//User jackson = userDAO.getUser("AJack7");
+		//userDAO.deleteUser(jackson);
+		//userDAO.getUsers().forEach((User u)->{System.out.println(u);});
+		
+		//User al = userDAO.getUser("Hamilton1");
+		//al.setBalance(10);
+		//userDAO.updateUser(al);
 		//System.out.println(al.getBalance());
 		//System.out.println(userDAO).getUser("GW100"));
 	}
