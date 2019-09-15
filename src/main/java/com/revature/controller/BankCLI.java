@@ -110,6 +110,12 @@ public class BankCLI {
 			serviceScreen();
 			break;
 		case "3" :
+			System.out.println("How much money would you like to withdraw?");
+			double withdrawal = sc.nextDouble();
+			bankService.withdraw(bankMember, withdrawal, userDAO);
+			System.out.println("Is there anything else we can help you with today?\n");
+			sc.nextLine();
+			serviceScreen();
 			break;
 		case "4" :
 			System.out.println("Thank you for Banking with us!");

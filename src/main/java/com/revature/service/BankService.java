@@ -1,5 +1,6 @@
 package com.revature.service;
 
+import com.revature.exception.OverdraftException;
 import com.revature.model.User;
 import com.revature.repository.UserDAO;
 
@@ -25,7 +26,15 @@ public class BankService {
 		System.out.println("Current Balance: " + format.format(bankMember.getBalance()) + "\n");
 	}
 	
-	public void withdraw() {
-		
+	public void withdraw(User bankMember, double withdrawal, UserDAO userDAO) {
+		double oldbalance = bankMember.getBalance();
+		if (withdrawal > oldbalance) {
+			throw new OverdraftException();
+		}
+		bankMember.setBalance(bankMember.getBalance() - withdrawal);
+		userDAO.updateUser(bankMember);
+		System.out.println("Previous Balance: " + format.format(oldbalance));
+		System.out.println("Withdrew: " + format.format(withdrawal));
+		System.out.println("Current Balance: " + format.format(bankMember.getBalance()) + "\n");
 	}
 }
