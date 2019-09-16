@@ -1,5 +1,6 @@
 package com.revature.service;
 
+import com.revature.exception.NegativeAmountException;
 import com.revature.exception.OverdraftException;
 import com.revature.model.User;
 import com.revature.repository.UserDAO;
@@ -18,6 +19,9 @@ public class BankService {
 	}
 	
 	public void deposit(User bankMember, double deposit, UserDAO userDAO) {
+		if (deposit < 0) {
+			throw new NegativeAmountException();
+		}
 		double oldbalance = bankMember.getBalance();
 		bankMember.setBalance(bankMember.getBalance() + deposit);
 		userDAO.updateUser(bankMember);
@@ -27,6 +31,9 @@ public class BankService {
 	}
 	
 	public void withdraw(User bankMember, double withdrawal, UserDAO userDAO) {
+		if (withdrawal < 0) {
+			throw new NegativeAmountException();
+		}
 		double oldbalance = bankMember.getBalance();
 		if (withdrawal > oldbalance) {
 			throw new OverdraftException();

@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import com.revature.exception.NegativeAmountException;
+import com.revature.exception.OverdraftException;
+import com.revature.exception.UserNotLoggedInException;
 import com.revature.model.User;
 import com.revature.repository.UserDAO;
 import com.revature.repository.UserDAOImplUJDBC;
@@ -29,6 +32,7 @@ public class BankCLI {
 		
 		switch(userInput) {
 		case "1" :
+			register();
 			break;
 		case "2" :
 			login();
@@ -81,9 +85,43 @@ public class BankCLI {
 		}
 	}
 	
-	public static void serviceScreen() {
+	public static void register() {
+		System.out.println("Thank you for choosing us for your banking needs!");
+		System.out.println("Please choose a Username:");
+		
+		boolean userNameExists = true;
+		String username = null;
+		while (userNameExists) {
+			username = sc.nextLine();
+			userNameExists = userNameUnavailable(username);
+		}
+		System.out.println("Please choose a password:");
+		String password  =  sc.nextLine();
+		System.out.println("Please Enter Your Name:");
+		String name = sc.nextLine();
+		
+		User newBankMember = new User(username, password, name);
+		userDAO.createUser(newBankMember);
+		System.out.println("Great " + newBankMember.getName() + "! Your account is all setup.");
+	}
+	
+	
+	public static boolean userNameUnavailable(String username) {
+		// Checks if that username is already in the database and lets you know if it is
+		// unavailable to use.
+		List<User> userlist = userDAO.getUsers();
+		for (User user : userlist) {
+			if (user.getUsername().equals(username)) {
+				System.out.println("That username already exists! Please enter another.");
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static void serviceScreen() throws NegativeAmountException, OverdraftException {
 		if (!loggedIn) {
-			//throw new Exception(UserNotLoggedIn);
+			throw new UserNotLoggedInException();
 		}
 		Arrays.asList(
 				"Select an Option",
@@ -104,7 +142,12 @@ public class BankCLI {
 		case "2" :
 			System.out.println("How much money would you like to deposit?");
 			double deposit = sc.nextDouble();
-			bankService.deposit(bankMember, deposit, userDAO);
+			try {
+				bankService.deposit(bankMember, deposit, userDAO);
+			} catch(NegativeAmountException e) {
+				System.out.println("Deposit failed: You must enter a positive amount!\n");
+			}
+			
 			System.out.println("Is there anything else we can help you with today?\n");
 			sc.nextLine();
 			serviceScreen();
@@ -112,7 +155,16 @@ public class BankCLI {
 		case "3" :
 			System.out.println("How much money would you like to withdraw?");
 			double withdrawal = sc.nextDouble();
-			bankService.withdraw(bankMember, withdrawal, userDAO);
+			try {
+				bankService.withdraw(bankMember, withdrawal, userDAO);
+			}
+			catch(NegativeAmountException e){
+				System.out.println("Withdrawal failed: You must enter a positive amount!\n");
+			}
+			catch(OverdraftException e) {
+				System.out.println("Withdrawal failed: There isn't enough money in your account" 
+					+ " to withdraw that amount!\n");
+			}
 			System.out.println("Is there anything else we can help you with today?\n");
 			sc.nextLine();
 			serviceScreen();
