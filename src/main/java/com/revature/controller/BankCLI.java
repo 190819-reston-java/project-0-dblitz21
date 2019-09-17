@@ -13,12 +13,15 @@ import com.revature.repository.UserDAO;
 import com.revature.repository.UserDAOImplUJDBC;
 import com.revature.service.BankService;
 
+import org.apache.log4j.Logger;
+
 public class BankCLI {
 	private static Scanner sc = new Scanner(System.in);
 	private static boolean loggedIn = false;
 	private static UserDAO userDAO = new UserDAOImplUJDBC();
 	private static User bankMember = null;
 	private static BankService bankService = new BankService();
+	public static Logger logger = Logger.getLogger(BankCLI.class);
 	public static void menu() {
 		Arrays.asList(
 			"Welcome to the Virtual Bank!",
@@ -42,6 +45,7 @@ public class BankCLI {
 			System.exit(0);
 			break;
 		default:
+			logger.debug("User attempted to enter something other than the recommend options");
 			System.out.println("Input Not Recognized");
 		}
 	}
@@ -103,6 +107,7 @@ public class BankCLI {
 		User newBankMember = new User(username, password, name);
 		userDAO.createUser(newBankMember);
 		System.out.println("Great " + newBankMember.getName() + "! Your account is all setup.");
+		logger.info("New Account created " + newBankMember.getName());
 	}
 	
 	
@@ -121,6 +126,7 @@ public class BankCLI {
 	
 	public static void serviceScreen() throws NegativeAmountException, OverdraftException {
 		if (!loggedIn) {
+			logger.fatal("User reached service screen without logging in");
 			throw new UserNotLoggedInException();
 		}
 		Arrays.asList(
@@ -145,6 +151,7 @@ public class BankCLI {
 			try {
 				bankService.deposit(bankMember, deposit, userDAO);
 			} catch(NegativeAmountException e) {
+				logger.error("User attempted to deposit a negative amount", e);
 				System.out.println("Deposit failed: You must enter a positive amount!\n");
 			}
 			
@@ -159,9 +166,11 @@ public class BankCLI {
 				bankService.withdraw(bankMember, withdrawal, userDAO);
 			}
 			catch(NegativeAmountException e){
+				logger.error("User attempted to enter a negative number for withdrawal amount", e);
 				System.out.println("Withdrawal failed: You must enter a positive amount!\n");
 			}
 			catch(OverdraftException e) {
+				logger.error("User attempted to withdraw money than in the account", e);
 				System.out.println("Withdrawal failed: There isn't enough money in your account" 
 					+ " to withdraw that amount!\n");
 			}
@@ -175,6 +184,7 @@ public class BankCLI {
 			break;
 		default:
 			System.out.println("Input Not Recognized");
+			logger.debug("User attempted to enter something other than the recommend options");
 		}
 	}
 
