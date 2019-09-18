@@ -2,6 +2,7 @@ package com.revature.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -46,7 +47,8 @@ public class BankCLI {
 			break;
 		default:
 			logger.debug("User attempted to enter something other than the recommend options");
-			System.out.println("Input Not Recognized");
+			System.out.println("Input Not Recognized \n");
+			menu();
 		}
 	}
 	
@@ -75,6 +77,8 @@ public class BankCLI {
 	}
 	
 	public static void checkPassword(User u) {
+		// Checks password and logs you in if password matches the password for that
+		// user in the database
 		System.out.println("Please type your password!");
 		String userinput = sc.nextLine();
 		if (userinput.equals(u.getPassword())) {
@@ -90,11 +94,15 @@ public class BankCLI {
 	}
 	
 	public static void register() {
+		// Lets the user set up an account
 		System.out.println("Thank you for choosing us for your banking needs!");
 		System.out.println("Please choose a Username:");
 		
 		boolean userNameExists = true;
 		String username = null;
+		
+		// checks that the username isn't already in the database and has the user
+		// reenter their name if it already exists.
 		while (userNameExists) {
 			username = sc.nextLine();
 			userNameExists = userNameUnavailable(username);
@@ -125,6 +133,7 @@ public class BankCLI {
 	}
 	
 	public static void serviceScreen() throws NegativeAmountException, OverdraftException {
+		// Service screen menu for logged in users
 		if (!loggedIn) {
 			logger.fatal("User reached service screen without logging in");
 			throw new UserNotLoggedInException();
@@ -147,10 +156,19 @@ public class BankCLI {
 			break;
 		case "2" :
 			System.out.println("How much money would you like to deposit?");
-			double deposit = sc.nextDouble();
+			
 			try {
+				double deposit = sc.nextDouble();
 				bankService.deposit(bankMember, deposit, userDAO);
-			} catch(NegativeAmountException e) {
+			}  catch(InputMismatchException e) {
+				logger.error("User did not enter a number during deposit", e);
+				System.out.println("You have to enter a valid number! Please try again. \n");
+				System.out.println("What would you like to do? \n");
+				sc.nextLine();
+				serviceScreen();
+			} 
+			
+			catch(NegativeAmountException e) {
 				logger.error("User attempted to deposit a negative amount", e);
 				System.out.println("Deposit failed: You must enter a positive amount!\n");
 			}
@@ -161,10 +179,17 @@ public class BankCLI {
 			break;
 		case "3" :
 			System.out.println("How much money would you like to withdraw?");
-			double withdrawal = sc.nextDouble();
 			try {
+				double withdrawal = sc.nextDouble();
 				bankService.withdraw(bankMember, withdrawal, userDAO);
-			}
+			}   catch(InputMismatchException e) {
+				logger.error("User did not enter a number during deposit", e);
+				System.out.println("You have to enter a valid number! Please try again. \n");
+				System.out.println("What would you like to do? \n");
+				sc.nextLine();
+				serviceScreen();
+			} 
+			
 			catch(NegativeAmountException e){
 				logger.error("User attempted to enter a negative number for withdrawal amount", e);
 				System.out.println("Withdrawal failed: You must enter a positive amount!\n");
@@ -183,8 +208,9 @@ public class BankCLI {
 			System.exit(0);
 			break;
 		default:
-			System.out.println("Input Not Recognized");
+			System.out.println("Input Not Recognized \n");
 			logger.debug("User attempted to enter something other than the recommend options");
+			serviceScreen();
 		}
 	}
 
