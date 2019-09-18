@@ -48,6 +48,7 @@ public class BankCLI {
 		default:
 			logger.debug("User attempted to enter something other than the recommend options");
 			System.out.println("Input Not Recognized \n");
+			delay(1000);
 			menu();
 		}
 	}
@@ -151,6 +152,7 @@ public class BankCLI {
 		switch(userInput) {
 		case "1" :
 			bankService.checkBalance(bankMember);
+			delay(1000);
 			System.out.println("Is there anything else we can help you with today?\n");
 			serviceScreen();
 			break;
@@ -163,6 +165,7 @@ public class BankCLI {
 			}  catch(InputMismatchException e) {
 				logger.error("User did not enter a number during deposit", e);
 				System.out.println("You have to enter a valid number! Please try again. \n");
+				delay(1000);
 				System.out.println("What would you like to do? \n");
 				sc.nextLine();
 				serviceScreen();
@@ -172,7 +175,7 @@ public class BankCLI {
 				logger.error("User attempted to deposit a negative amount", e);
 				System.out.println("Deposit failed: You must enter a positive amount!\n");
 			}
-			
+			delay(1000);
 			System.out.println("Is there anything else we can help you with today?\n");
 			sc.nextLine();
 			serviceScreen();
@@ -185,6 +188,7 @@ public class BankCLI {
 			}   catch(InputMismatchException e) {
 				logger.error("User did not enter a number during deposit", e);
 				System.out.println("You have to enter a valid number! Please try again. \n");
+				delay(1000);
 				System.out.println("What would you like to do? \n");
 				sc.nextLine();
 				serviceScreen();
@@ -199,6 +203,7 @@ public class BankCLI {
 				System.out.println("Withdrawal failed: There isn't enough money in your account" 
 					+ " to withdraw that amount!\n");
 			}
+			delay(1000);
 			System.out.println("Is there anything else we can help you with today?\n");
 			sc.nextLine();
 			serviceScreen();
@@ -210,8 +215,19 @@ public class BankCLI {
 		default:
 			System.out.println("Input Not Recognized \n");
 			logger.debug("User attempted to enter something other than the recommend options");
+			delay(1000);
 			serviceScreen();
 		}
+	}
+	
+	public static void delay(int wait) {
+		//Allows for a delay between menues
+		try {
+			Thread.sleep(wait);
+		} catch (InterruptedException e) {		
+			e.printStackTrace();
+		}
+		
 	}
 
 }
